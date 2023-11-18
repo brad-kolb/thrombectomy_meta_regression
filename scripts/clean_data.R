@@ -3,6 +3,7 @@
 # author: Bradley Kolb
 # date: 18-November-2023
 # contact: bradkolb@gmail.com
+# references: Bayesian Data Analysis, Gelman et al. (BDA)
 
 #### work space setup ####
 # load packages
@@ -22,8 +23,8 @@ data_raw <- read_csv(
   file = file_in
 )
 
-# make tibble for independent
-# these definitions follow the nomenclature from Gelman et al., Bayesian Data Analysis
+# make tibble holding results for independent patients in treatment and control arms
+# column names follow the conventions from BDA
 independent <- tibble(
   j = data_raw %>% 
     filter(treatment_id == 1) %>% 
@@ -42,12 +43,14 @@ independent <- tibble(
     .$ind_mrs,
 )
 
+# add estimates for treatment effect and standard error
+# quotes are from BDA
 # "Relatively simple Bayesian meta-analysis is possible using the normal-theory results of the previous sections if we summarize the results of each experiment j with an approximate normal likelihood for the parameter theta_j . This is possible with a number of standard analytic approaches that produce a point estimate and standard errors, which can be regarded as approximating a normal mean and standard deviation. One approach is based on empirical logits"
 independent <- independent %>% 
   mutate(
-    # for each study j, one can estimate theta_j by
+# for each study j, one can estimate theta_j by
     y_j = log(y_1j / (n_1j - y_1j)) - log(y_0j / (n_0j - y_0j)),
-    # with approximate sampling variance
+# with approximate sampling variance
     sigma2_j = 1/y_1j + 1/(n_1j - y_1j) + 1/y_0j + 1/(n_0j - y_0j)
   )
 
