@@ -42,8 +42,13 @@ independent <- tibble(
     .$ind_mrs,
 )
 
+# "Relatively simple Bayesian meta-analysis is possible using the normal-theory results of the previous sections if we summarize the results of each experiment j with an approximate normal likelihood for the parameter theta_j . This is possible with a number of standard analytic approaches that produce a point estimate and standard errors, which can be regarded as approximating a normal mean and standard deviation. One approach is based on empirical logits"
 independent <- independent %>% 
   mutate(
+    # for each study j, one can estimate theta_j by
     y_j = log(y_1j / (n_1j - y_1j)) - log(y_0j / (n_0j - y_0j)),
-    sigma_j = 1/y_1j + 1/(n_1j - y_1j) + 1/y_0j + 1/(n_0j - y_0j)
+    # with approximate sampling variance
+    sigma2_j = 1/y_1j + 1/(n_1j - y_1j) + 1/y_0j + 1/(n_0j - y_0j)
   )
+
+# "We use the notation y_j and sigma2_j to be consistent with our earlier expressions for the hierarchical normal model."
