@@ -52,7 +52,7 @@ fit$save_object(file = file_out)
 fit$print(max_rows=100) 
 # save output
 fit$summary() %>% 
-  write_csv(data_out)
+  write_delim(data_out, " ")
 
 # 95% intervals for hyperparameters and posterior predictive distribution
 fit$summary(variables = c("mu", "tau", "theta_new"),
