@@ -1,5 +1,5 @@
 #### preamble ####
-# purpose: fit normal approximation meta analysis model to stroke thrombectomy data
+# purpose: fit normal approximation meta analysis model with informed priors to stroke thrombectomy data
 # author: Bradley Kolb
 # date: 21-November-2023
 # contact: bradkolb@gmail.com
@@ -16,10 +16,10 @@ bayesplot_theme_set(theme_bw())
 
 # set output files
 file_out <- here("fits", 
-                 "norm_approx.rds")
+                 "norm_approx_informed.rds")
 
 data_out <- here("results",
-                 "norm_approx.csv")
+                 "norm_approx_informed.csv")
 
 #### model fit  ####
 # import processed data for mrs 0-2
@@ -38,7 +38,7 @@ dat <- list(J = nrow(data),
 
 # translate and compile
 model <- cmdstan_model(here("models", 
-                            "norm_approx.stan"))
+                            "norm_approx_informed.stan"))
 
 # run sampler
 fit <- model$sample(data = dat, 
@@ -80,3 +80,4 @@ draws <- posterior::as_draws_array(fit) # extract posterior draws
 np_fit <- nuts_params(fit) # get NUTS parameters
 mcmc_trace(draws, pars = c("mu","tau"),np = np_fit) + 
   xlab("Post-warmup iteration")
+
