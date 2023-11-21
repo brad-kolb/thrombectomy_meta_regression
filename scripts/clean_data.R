@@ -12,33 +12,33 @@ library(tidyverse)
 
 # set input file
 # this data was manually entered into a spreadsheet by me
-file_in <- here("data/data_raw", "raw_data.csv")
+file_in <- here("data", "raw_data.csv")
 
 # set output files
 # independent defined as mrs 0, 1, or 2
-file_out <- here("data/data_processed", "independent.csv")
+file_out <- here("data", "independent.csv")
 
 # read in data
-data_raw <- read_csv(
+data <- read_csv(
   file = file_in
 )
 
 # make tibble holding results for independent patients in treatment and control arms
 # column names follow the conventions from BDA
 independent <- tibble(
-  j = data_raw %>% 
+  J = data_raw %>% 
     filter(treatment_id == 1) %>% 
     .$trial_id, 
-  n_0j = data_raw %>% 
+  n_0 = data_raw %>% 
     filter(treatment_id == 0) %>% 
     .$tot_actual,
-  n_1j = data_raw %>% 
+  n_1 = data_raw %>% 
     filter(treatment_id ==1) %>% 
     .$tot_actual,
-  y_0j = data_raw %>% 
+  y_0 = data_raw %>% 
     filter(treatment_id == 0) %>% 
     .$ind_mrs,
-  y_1j = data_raw %>% 
+  y_1 = data_raw %>% 
     filter(treatment_id == 1) %>% 
     .$ind_mrs,
 )
@@ -49,9 +49,11 @@ independent <- tibble(
 independent <- independent %>% 
   mutate(
 # for each study j, one can estimate theta_j by
-    y_j = log(y_1j / (n_1j - y_1j)) - log(y_0j / (n_0j - y_0j)),
+    est = log(y_1 / (n_1 - y_1)) - log(y_0 / (n_0 - y_0)),
 # with approximate sampling variance
-    sigma2_j = 1/y_1j + 1/(n_1j - y_1j) + 1/y_0j + 1/(n_0j - y_0j)
+    se = 1/y_1 + 1/(n_1 - y_1) + 1/y_0 + 1/(n_0 - y_0)
   )
 
-# "We use the notation y_j and sigma2_j to be consistent with our earlier expressions for the hierarchical normal model."
+# save as csv file
+independent %>% 
+  write_csv(file_out)
