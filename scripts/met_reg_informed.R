@@ -21,6 +21,12 @@ file_out <- here("fits",
 data_out <- here("results",
                  "met_reg_informed.csv")
 
+table1 <- here("analysis",
+               "met_reg_informed_table1.csv")
+
+table2 <- here("analysis",
+               "met_reg_informed_table2.csv")
+
 #### model fit  ####
 # import processed data for mrs 0-2
 file_in <- here("data", 
@@ -59,7 +65,7 @@ fit$summary() %>%
   write_csv(data_out)
 
 # 95% intervals for hyperparameters and posterior predictive distribution
-fit$summary(variables = c("mu", "tau", "beta", "phi_new"),
+fit$summary(variables = c("mu", "tau", "beta", "theta_new"),
             "mean",
             "sd",
             extra_quantiles = ~posterior::quantile2(., probs = c(.0275, .975))) 
@@ -84,3 +90,28 @@ mcmc_trace(draws, pars = c("mu","tau"),np = np_fit) +
   xlab("Post-warmup iteration")
 mcmc_trace(draws, pars = c("beta[1]","beta[2]", "beta[3]", "beta[4]"),np = np_fit) + 
   xlab("Post-warmup iteration")
+
+#### analyze #### 
+
+# table 1 #
+posterior_quantiles <- fit$summary(
+  variables = c("theta"),
+  "median",
+  extra_quantiles = ~posterior::quantile2(., probs = c(.0275, .975))) %>% 
+  mutate(variable = 1:nrow(.)) %>% 
+  rename(J = variable)
+
+left_join(data, posterior_quantiles) %>% 
+  relocate(y_0, .before = n_0) %>% 
+  relocate(y_1, .before = n_1) %>% 
+  write_csv(table1)
+
+# table 2 #
+posterior_predictive_quantiles <- fit$summary(
+  variables = c("theta_new"),
+  "median",
+  extra_quantiles = ~posterior::quantile2(., probs = c(.0275, .975))) %>% 
+  mutate(variable = 1:nrow(.)) %>% 
+  rename(K = variable) %>% 
+  write_csv(table2)
+

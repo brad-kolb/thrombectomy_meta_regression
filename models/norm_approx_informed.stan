@@ -13,10 +13,10 @@ parameters {
   vector<offset=mu, multiplier=tau>[J] theta;
 }
 model {
-  est ~ normal(theta, se);
-  theta ~ normal(mu, tau);
   mu ~ normal(0, 1);
   tau ~ normal(0, 1);
+  est ~ normal(theta, se);
+  theta ~ normal(mu, tau);
 }
 generated quantities {
   real theta_new = normal_rng(mu, tau);

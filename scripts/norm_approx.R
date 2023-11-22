@@ -24,6 +24,9 @@ data_out <- here("results",
 table1 <- here("analysis",
                "norm_approx_table1.csv")
 
+table2 <- here("analysis",
+               "norm_approx_table2.csv")
+
 #### model fit  ####
 # import processed data for mrs 0-2
 file_in <- here("data", 
@@ -90,10 +93,18 @@ posterior_quantiles <- fit$summary(
   variables = c("theta"),
   "median",
   extra_quantiles = ~posterior::quantile2(., probs = c(.0275, .975))) %>% 
-  mutate(variable = 1:21) %>% 
+  mutate(variable = 1:nrow(.)) %>% 
   rename(J = variable)
 
 left_join(data, posterior_quantiles) %>% 
   relocate(y_0, .before = n_0) %>% 
   relocate(y_1, .before = n_1) %>% 
   write_csv(table1)
+
+# table 2 #
+posterior_predictive_quantiles <- fit$summary(
+  variables = c("theta_new"),
+  "median",
+  extra_quantiles = ~posterior::quantile2(., probs = c(.0275, .975))) %>% 
+  write_csv(table2)
+

@@ -14,24 +14,24 @@ parameters {
   real mu;
   real<lower=0> tau;
   vector[K] beta;
-  vector<offset=mu,multiplier=tau>[J] theta;
+  vector<offset=mu,multiplier=tau>[J] phi;
 }
 transformed parameters {
-  vector[J] phi;
+  vector[J] theta;
   for (j in 1:J) {
-    phi[j] = theta[j] + beta[kk[j]];
+    theta[j] = phi[j] + beta[kk[j]];
   }
 }
 model {
   beta ~ std_normal();
   mu ~ std_normal();
   tau ~ std_normal();
-  est ~ normal(phi, se);
-  theta ~ normal(mu, tau);
+  est ~ normal(theta, se);
+  phi ~ normal(mu, tau);
 }
 generated quantities {
-  vector[K] phi_new;
+  vector[K] theta_new;
   for (k in 1:K) {
-    phi_new[k] = normal_rng(mu + beta[k], tau);
+    theta_new[k] = normal_rng(mu + beta[k], tau);
   }
 }
