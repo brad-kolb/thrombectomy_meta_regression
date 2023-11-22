@@ -1,4 +1,4 @@
-// bayesian meta-regression using normal approximation
+// bayesian meta-regression using normal approximation 
 // fixed effects for type of trial (large core, small core, late, basilar)
 // see chapter 5 of Bayesian Data Analysis by Gelman et al
 // or https://statmodeling.stat.columbia.edu/2022/02/28/answering-some-questions-about-meta-analysis-using-ivermectin-as-an-example/
@@ -18,13 +18,13 @@ parameters {
 }
 transformed parameters {
   vector[J] phi;
-  for (k in 1:K) {
-    phi = theta + beta[k];
+  for (j in 1:J) {
+    phi[j] = theta[j] + beta[kk[j]];
   }
 }
 model {
   beta ~ std_normal();
-  est ~ normal(theta + beta[kk], se);
+  est ~ normal(phi, se);
   theta ~ normal(mu, tau);
 }
 generated quantities {

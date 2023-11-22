@@ -18,15 +18,15 @@ parameters {
 }
 transformed parameters {
   vector[J] phi;
-  for (k in 1:K) {
-    phi = theta + beta[k];
+  for (j in 1:J) {
+    phi[j] = theta[j] + beta[kk[j]];
   }
 }
 model {
   beta ~ std_normal();
   mu ~ std_normal();
   tau ~ std_normal();
-  est ~ normal(theta + beta[kk], se);
+  est ~ normal(phi, se);
   theta ~ normal(mu, tau);
 }
 generated quantities {
