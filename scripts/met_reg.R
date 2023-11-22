@@ -85,3 +85,8 @@ mcmc_trace(draws, pars = c("mu","tau"),np = np_fit) +
 mcmc_trace(draws, pars = c("beta[1]","beta[2]", "beta[3]", "beta[4]"),np = np_fit) + 
   xlab("Post-warmup iteration")
 
+#### analyze #### 
+
+fit$summary(variables = c("phi"),
+            "median",
+            extra_quantiles = ~posterior::quantile2(., probs = c(.0275, .975))) 

@@ -21,6 +21,9 @@ file_out <- here("fits",
 data_out <- here("results",
                  "norm_approx.csv")
 
+table1 <- here("analysis",
+               "norm_approx_table1.csv")
+
 #### model fit  ####
 # import processed data for mrs 0-2
 file_in <- here("data", 
@@ -80,3 +83,17 @@ draws <- posterior::as_draws_array(fit) # extract posterior draws
 np_fit <- nuts_params(fit) # get NUTS parameters
 mcmc_trace(draws, pars = c("mu","tau"),np = np_fit) + 
   xlab("Post-warmup iteration")
+
+#### analyze #### 
+
+posterior_quantiles <- fit$summary(
+  variables = c("theta"),
+  "median",
+  extra_quantiles = ~posterior::quantile2(., probs = c(.0275, .975))) %>% 
+  mutate(variable = 1:21) %>% 
+  rename(J = variable)
+
+left_join(data, posterior_quantiles) %>% 
+  relocate(y_0, .before = n_0) %>% 
+  relocate(y_1, .before = n_1) %>% 
+  write_csv(table1)
