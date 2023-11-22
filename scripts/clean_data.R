@@ -26,19 +26,22 @@ data <- read_csv(
 # make tibble holding results for independent patients in treatment and control arms
 # column names follow the conventions from BDA
 independent <- tibble(
-  J = data_raw %>% 
+  J = data %>% 
     filter(treatment_id == 1) %>% 
     .$trial_id, 
-  n_0 = data_raw %>% 
+  K = data %>% 
+    filter(treatment_id == 1) %>% 
+    .$group_id,
+  n_0 = data %>% 
     filter(treatment_id == 0) %>% 
     .$tot_actual,
-  n_1 = data_raw %>% 
+  n_1 = data %>% 
     filter(treatment_id ==1) %>% 
     .$tot_actual,
-  y_0 = data_raw %>% 
+  y_0 = data %>% 
     filter(treatment_id == 0) %>% 
     .$ind_mrs,
-  y_1 = data_raw %>% 
+  y_1 = data %>% 
     filter(treatment_id == 1) %>% 
     .$ind_mrs,
 )
