@@ -1,9 +1,9 @@
 #### preamble ####
-# purpose: clean manually collected thrombectomy trial data
+# purpose: clean and prepare manually collected thrombectomy trial data
 # author: Bradley Kolb
 # date: 18-November-2023
 # contact: bradkolb@gmail.com
-# references: Bayesian Data Analysis, Gelman et al. (BDA)
+# references: Bayesian Data Analysis, Gelman et al. (BDA); mc-stan.org/docs part 1 chap 6
 
 #### work space setup ####
 # load packages
@@ -24,39 +24,38 @@ data <- read_csv(
 )
 
 # make tibble holding results for independent patients in treatment and control arms
-# column names follow the conventions from BDA
 independent <- tibble(
-  J = data %>% 
+  J = data %>% # number of trials
     filter(treatment_id == 1) %>% 
     .$trial_id, 
-  K = data %>% 
+  K = data %>% # types of trials (1=large core, 2=small core early, 3=small core late, 4=basilar)
     filter(treatment_id == 1) %>% 
     .$group_id,
-  n_0 = data %>% 
+  n_c = data %>% # number of cases, control
     filter(treatment_id == 0) %>% 
     .$tot_actual,
-  n_1 = data %>% 
-    filter(treatment_id ==1) %>% 
-    .$tot_actual,
-  y_0 = data %>% 
+  r_c = data %>% # number of successes, control
     filter(treatment_id == 0) %>% 
     .$ind_mrs,
-  y_1 = data %>% 
+  n_t = data %>% # number of cases, treatment
+    filter(treatment_id ==1) %>% 
+    .$tot_actual,
+  r_t = data %>% #number of successes, treatment
     filter(treatment_id == 1) %>% 
     .$ind_mrs,
 )
 
-# add estimates for treatment effect and standard error
-# quotes are from BDA
-# "Relatively simple Bayesian meta-analysis is possible using the normal-theory results of the previous sections if we summarize the results of each experiment j with an approximate normal likelihood for the parameter theta_j . This is possible with a number of standard analytic approaches that produce a point estimate and standard errors, which can be regarded as approximating a normal mean and standard deviation. One approach is based on empirical logits"
+# add empirical estimates for the treatment effect of each trial
 independent <- independent %>% 
   mutate(
-# for each study j, one can estimate theta_j by
-    est = log(y_1 / (n_1 - y_1)) - log(y_0 / (n_0 - y_0)),
-# with approximate sampling variance
-    se = 1/y_1 + 1/(n_1 - y_1) + 1/y_0 + 1/(n_0 - y_0)
+# log odds ratio
+    y = log(r_t / (n_t - r_t)) - log(r_c / (n_c - r_c)),
+# approximate standard error
+    sigma = sqrt(1/r_t + 1/(n_t - r_t) + 1/r_c + 1/(n_c - r_c))
   )
 
 # save as csv file
 independent %>% 
   write_csv(file_out)
+
+independent %>% print(n=100)

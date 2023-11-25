@@ -62,12 +62,6 @@ fit$print(max_rows=100)
 fit$summary() %>% 
   write_csv(data_out)
 
-# 95% intervals for hyperparameters and posterior predictive distribution
-fit$summary(variables = c("mu", "tau", "theta_new"),
-            "mean",
-            "sd",
-            extra_quantiles = ~posterior::quantile2(., probs = c(.0275, .975))) 
-
 #### diagnostic plots ####
 
 ### r_hat ###

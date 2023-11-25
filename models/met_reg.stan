@@ -13,25 +13,32 @@ data {
 parameters {
   real mu;
   real<lower=0> tau;
-  vector[K] beta;
   vector<offset=mu,multiplier=tau>[J] phi;
+  real beta;
+  real<lower=0> sigma;
+  vector<offset=beta,multiplier=sigma>[K] psi;
 }
 transformed parameters {
   vector[J] theta;
   for (j in 1:J) {
-    theta[j] = phi[j] + beta[kk[j]];
+    theta[j] = phi[j] + psi[kk[j]];
   }
 }
 model {
+  mu ~ std_normal();
   beta ~ std_normal();
+  sigma ~ std_normal();
+  tau ~ std_normal();
   est ~ normal(theta, se);
   phi ~ normal(mu, tau);
+  psi ~ normal(beta, sigma);
 }
 generated quantities {
   vector[K] theta_new;
   for (k in 1:K) {
-    theta_new[k] = normal_rng(mu + beta[k], tau);
+    theta_new[k] = normal_rng(mu, tau) + psi[k];
   }
 }
+
 
 

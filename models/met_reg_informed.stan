@@ -8,7 +8,7 @@ data {
   int<lower=1> K; // types of trials
   vector[J] est;
   vector[J] se;
-  array[J] int<lower=1,upper=K> kk; // covariate for fixed effect of trial type
+  array[J] int<lower=1,upper=K> kk; // covariate for trial type
 }
 parameters {
   real mu;
@@ -32,6 +32,6 @@ model {
 generated quantities {
   vector[K] theta_new;
   for (k in 1:K) {
-    theta_new[k] = normal_rng(mu + beta[k], tau);
+    theta_new[k] = normal_rng(mu, tau) + beta[k];
   }
 }
