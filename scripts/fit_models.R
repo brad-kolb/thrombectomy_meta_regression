@@ -64,9 +64,43 @@ fit_random$save_object(file = file_out)
 fit_random$summary() %>% 
   write_csv(data_out)
 
+#### meta-regression model ####
+# read in data
+file_in <- here("data", "independent.csv")
+data <- read_csv(file = file_in) 
+# data <- data %>% 
+#   filter(K == 1 | K == 2 | K == 3) %>% 
+#   mutate(K = if_else(K == 3, 2, K))
+# create trimmed data list appropriate for stan
+dat <- list(J = nrow(data),
+            K = max(data$K),
+            x = data$K,
+            y = data$y,
+            sigma = data$sigma)
+# set up paths
+file_out <- here("fits", 
+                 "meta_regression.rds")
+data_out <- here("results",
+                 "meta_regression.csv")
+# translate and compile stan model to c++
+model <- cmdstan_model(here("models", 
+                            "meta_regression.stan"))
+# run sampler
+fit_meta_regression <- model$sample(data = dat, 
+                           chains = 4,
+                           parallel_chains = 4,
+                           save_warmup = TRUE)
+# save model fit
+fit_meta_regression$save_object(file = file_out)
+# save model summary
+fit_meta_regression$summary() %>% 
+  write_csv(data_out)
+
+
 # view summaries
 fit_fixed$print(max_rows=100) 
 fit_random$print(max_rows=100)
+fit_meta_regression$print(max_rows=100)
 
 
 #### diagnostic plots ####
