@@ -96,11 +96,42 @@ fit_meta_regression$save_object(file = file_out)
 fit_meta_regression$summary() %>% 
   write_csv(data_out)
 
+#### binary ####
+# read in data
+file_in <- here("data", "independent_binary.csv")
+data <- read_csv(file = file_in) 
+
+dat <- list(
+  N = nrow(data),
+  J = max(data$trial),
+  jj = data$trial,
+  y = data$outcome,
+  x = data$treatment
+)
+
+# set up paths
+file_out <- here("fits", 
+                 "binary.rds")
+data_out <- here("results",
+                 "binary.csv")
+# translate and compile stan model to c++
+model <- cmdstan_model(here("models", 
+                            "binary.stan"))
+# run sampler
+fit_binary <- model$sample(data = dat, chains = 4, parallel_chains = 4, save_warmup = TRUE)
+# save model fit
+fit_binary$save_object(file = file_out)
+# save model summary
+fit_binary$summary() %>% 
+  write_csv(data_out)
+
+
 
 # view summaries
 fit_fixed$print(max_rows=100) 
 fit_random$print(max_rows=100)
 fit_meta_regression$print(max_rows=100)
+fit_binary$print(max_rows=111)
 
 
 #### diagnostic plots ####
@@ -110,7 +141,7 @@ fit_meta_regression$print(max_rows=100)
 # a heuristic for convergence of chains. not a test
 mcmc_rhat(rhat(fit_fixed))
 mcmc_rhat(rhat(fit_random))
-
+mcmc_rhat(rhat(fit_meta_regression))
 
 ### n_eff ###
 # how long would the chain be if each sample was perfectly independent
@@ -118,6 +149,7 @@ mcmc_rhat(rhat(fit_random))
 # heuristic is to worry about any values less than 0.1
 mcmc_neff(neff_ratio(fit_fixed, size = 2))
 mcmc_neff(neff_ratio(fit_random, size = 2))
+mcmc_neff(neff_ratio(fit_meta_regression, size = 2))
 
 ### trace plot ###
 draws <- posterior::as_draws_array(fit_fixed) # extract posterior draws
@@ -128,4 +160,11 @@ mcmc_trace(draws, pars = c("theta"),np = np_fit) +
 draws <- posterior::as_draws_array(fit_random) # extract posterior draws
 np_fit <- nuts_params(fit_random) # get NUTS parameters
 mcmc_trace(draws, pars = c("mu","tau"),np = np_fit) + 
+  xlab("Post-warmup iteration")
+
+draws <- posterior::as_draws_array(fit_meta_regression) # extract posterior draws
+np_fit <- nuts_params(fit_meta_regression) # get NUTS parameters
+mcmc_trace(draws, pars = c("mu","tau"),np = np_fit) + 
+  xlab("Post-warmup iteration")
+mcmc_trace(draws, pars = c("beta[1]", "beta[2]", "beta[3]", "beta[4]"),np = np_fit) + 
   xlab("Post-warmup iteration")

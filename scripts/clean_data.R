@@ -58,4 +58,33 @@ independent <- independent %>%
 independent %>% 
   write_csv(file_out)
 
-independent %>% print(n=100)
+#### convert to long format ####
+file_out <- here("data", "independent_binary.csv")
+
+trial_control_success <- unlist(map2(independent$J, independent$r_c, function(x,y) rep(x,y)))
+trial_control_fail <- unlist(map2(independent$J, independent$n_c - independent$r_c, function(x,y) rep(x,y)))
+success_control <- unlist(map(independent$r_c, function(x) rep(1, x)))
+failure_control <- unlist(map(independent$n_c - independent$r_c, function(x) rep(0, x)))
+binary_control <- tibble(
+  trial = c(trial_control_success, trial_control_fail),
+  outcome = c(success_control, failure_control),
+  treatment = 0
+)
+
+trial_treatment_success <- unlist(map2(independent$J, independent$r_t, function(x,y) rep(x,y)))
+trial_treatment_fail <- unlist(map2(independent$J, independent$n_t - independent$r_t, function(x,y) rep(x,y)))
+success_treatment <- unlist(map(independent$r_t, function(x) rep(1, x)))
+failure_treatment <- unlist(map(independent$n_t - independent$r_t, function(x) rep(0, x)))
+binary_treatment <- tibble(
+  trial = c(trial_treatment_success, trial_treatment_fail),
+  outcome = c(success_treatment, failure_treatment),
+  treatment = 1
+)
+
+binary <- rbind(binary_control, binary_treatment)
+
+binary %>% 
+  write_csv(file_out)
+
+binary %>% print(n=100)
+
