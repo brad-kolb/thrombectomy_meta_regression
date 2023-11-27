@@ -125,8 +125,6 @@ fit_binary$save_object(file = file_out)
 fit_binary$summary() %>% 
   write_csv(data_out)
 
-
-
 # view summaries
 fit_fixed$print(max_rows=100) 
 fit_random$print(max_rows=100)
