@@ -14,9 +14,13 @@ parameters {
   real<lower=0> tau; // deviation of treatment effects
 }
 model {
-  y ~ normal(theta, sigma); // likelihood
+  // likelihood
   for (j in 1:J) {
-  theta[j] ~ normal(mu + beta[x[j]], tau);
+  y[j] ~ normal(theta[j] + beta[x[j]], sigma[j]); 
+  }
+  // priors
+  for (j in 1:J) {
+  theta[j] ~ normal(mu, tau);
   }
   { mu, tau } ~ normal(0,1);
   beta ~ normal(0,1);
@@ -24,6 +28,6 @@ model {
 generated quantities {
   array[K] real y_new;
   for (k in 1:K) {
-  y_new[k] = normal_rng(mu + beta[k], tau);
+  y_new[k] = normal_rng(mu, tau) + beta[k];
   }
 }
