@@ -1,4 +1,5 @@
 // random effects metaanalysis with binary data, non-centered parameterization
+
 data{
   int<lower=1> N; // observations
   int<lower=1> J; // trials

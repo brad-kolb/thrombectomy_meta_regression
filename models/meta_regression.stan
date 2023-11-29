@@ -1,4 +1,5 @@
-// random effects meta-analysis with a trial-specific covariate
+// random effects meta-analysis with trial-specific covariates ("meta-regression")
+// non-centered parameterization
 
 data {
   int<lower=1> J; // number of trials
@@ -9,9 +10,10 @@ data {
 }
 parameters {
   array[K] real beta; // per-trial-type treatment effect
-  array[J] real theta; // per-trial treatment effect
+  
   real mu; // mean treatment effect
   real<lower=0> tau; // deviation of treatment effects
+  vector<offset=mu,multiplier=tau>[J] theta; // per-trial treatment effect
 }
 model {
   // likelihood
