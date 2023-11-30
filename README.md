@@ -1,2 +1,3 @@
 # thrombectomy_meta_regression
- Meta-regression for mechanical thrombectomy trials
+ Develops a Bayesian meta-regression model for estimating the treatment effect
+ of mechanical thrombectomy across different types of LVO.
