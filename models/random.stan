@@ -17,6 +17,6 @@ model {
   tau ~ cauchy(0, 1);  // prior on deviation of treatment effects
 }
 generated quantities {
-  real y_new = normal_rng(mu, tau); // posterior predictive distribution
+  real theta_new = normal_rng(mu, tau); // posterior predictive distribution
 }
 

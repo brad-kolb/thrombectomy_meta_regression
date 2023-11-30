@@ -10,7 +10,6 @@ data {
 }
 parameters {
   array[K] real beta; // per-trial-type treatment effect
-  
   real mu; // mean treatment effect
   real<lower=0> tau; // deviation of treatment effects
   vector<offset=mu,multiplier=tau>[J] theta; // per-trial treatment effect
@@ -28,8 +27,8 @@ model {
   beta ~ normal(0,1);
 }
 generated quantities {
-  array[K] real y_new;
+  array[K] real theta_new;
   for (k in 1:K) {
-  y_new[k] = normal_rng(mu, tau) + beta[k];
+  theta_new[k] = normal_rng(mu, tau) + beta[k];
   }
 }
