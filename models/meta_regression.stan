@@ -10,6 +10,7 @@ data {
 }
 parameters {
   array[K] real beta; // per-trial-type treatment effect
+  
   real mu; // mean treatment effect
   real<lower=0> tau; // deviation of treatment effects
   vector<offset=mu,multiplier=tau>[J] theta; // per-trial treatment effect
